@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { formatNumero, getRecettesParCategorie } from "@/lib/recettes";
 
-export default function Sommaire() {
-  const categories = getRecettesParCategorie();
+export default async function Sommaire() {
+  const categories = await getRecettesParCategorie();
 
   return (
     <main className="mx-auto w-full max-w-3xl px-6 py-20 sm:py-28">

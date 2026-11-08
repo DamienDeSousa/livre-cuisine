@@ -4,15 +4,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatNumero, getRecette, getRecettes } from "@/lib/recettes";
 
-export function generateStaticParams() {
-  return getRecettes().map((recette) => ({ slug: recette.slug }));
+export async function generateStaticParams() {
+  const recettes = await getRecettes();
+  return recettes.map((recette) => ({ slug: recette.slug }));
 }
 
 export async function generateMetadata({
   params,
 }: PageProps<"/recettes/[slug]">): Promise<Metadata> {
   const { slug } = await params;
-  const recette = getRecette(slug);
+  const recette = await getRecette(slug);
   if (!recette) return {};
   return { title: recette.nom, description: recette.sousTitre };
 }
@@ -21,7 +22,7 @@ export default async function PageRecette({
   params,
 }: PageProps<"/recettes/[slug]">) {
   const { slug } = await params;
-  const recette = getRecette(slug);
+  const recette = await getRecette(slug);
   if (!recette) notFound();
 
   return (
