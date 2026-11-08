@@ -9,6 +9,8 @@ export default defineConfig({
   schema: "./db/schema.ts",
   out: "./db/migrations",
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    // Sur Neon, les migrations passent par la connexion directe (sans pooler).
+    // En local, seule DATABASE_URL existe.
+    url: process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL!,
   },
 });

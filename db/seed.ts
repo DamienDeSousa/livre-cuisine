@@ -1,13 +1,18 @@
-// Ajoute les recettes de départ absentes de la base (par slug ou numéro).
-// Ne modifie ni ne supprime les recettes existantes.
-// Usage : npm run db:seed
+// Remplit la base avec les recettes de départ, seulement si elle est vide :
+// une recette supprimée ensuite ne réapparaît donc pas au déploiement suivant.
+// Usage : npm run db:seed (lancé aussi à chaque build de production Vercel)
 
 import { db } from "./index";
 import { etapes, ingredients, recettes } from "./schema";
 import { recettesDeDepart } from "./seed-data";
 
 async function main() {
-  const ajoutees = await db.transaction(async (tx) => {
+  if ((await db.$count(recettes)) > 0) {
+    console.log("Base déjà remplie : seed ignoré.");
+    return;
+  }
+
+  await db.transaction(async (tx) => {
     const inserees = await tx
       .insert(recettes)
       .values(
@@ -24,7 +29,6 @@ async function main() {
           note: r.note,
         })),
       )
-      .onConflictDoNothing()
       .returning({ id: recettes.id, slug: recettes.slug });
 
     for (const { id, slug } of inserees) {
@@ -50,13 +54,9 @@ async function main() {
         );
       }
     }
-
-    return inserees.length;
   });
 
-  console.log(
-    `${ajoutees} recette(s) ajoutée(s), ${recettesDeDepart.length - ajoutees} déjà présente(s).`,
-  );
+  console.log(`${recettesDeDepart.length} recettes de départ ajoutées.`);
 }
 
 main()

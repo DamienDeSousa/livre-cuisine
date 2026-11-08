@@ -9,8 +9,9 @@
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "tsx --env-file=.env db/seed.ts",
-    "db:studio": "drizzle-kit studio"
+    "db:seed": "tsx --env-file-if-exists=.env db/seed.ts",
+    "db:studio": "drizzle-kit studio",
+    "vercel-build": "if [ \"$VERCEL_ENV\" = production ]; then npm run db:migrate && npm run db:seed; fi && next build"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
